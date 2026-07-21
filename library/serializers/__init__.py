@@ -1,2 +1,3 @@
 from .author_serializer import AuthorSerializer
+from .book_serializer import BookSerializer
 from .category_serializer import CategorySerializer
