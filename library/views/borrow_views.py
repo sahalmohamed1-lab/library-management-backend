@@ -1,44 +1,35 @@
 from django.utils import timezone
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from library.models import Book, BorrowRecord
+
+from library.models import BorrowRecord
 from library.serializers import BorrowRecordSerializer
+
 
 class BorrowBookView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        book_id = request.data.get("book")
-
-        try:
-            book = Book.objects.get(pk=book_id)
-        except Book.DoesNotExist:
-            return Response(
-                {"error": "Book not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if not book.available:
-            return Response(
-                {"error": "Book is already borrowed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        borrow = BorrowRecord.objects.create(
-            user=request.user,
-            book=book,
+        serializer = BorrowRecordSerializer(
+            data=request.data,
+            context={"request": request},
         )
 
-        book.available = False
-        book.save()
+        serializer.is_valid(raise_exception=True)
 
-        serializer = BorrowRecordSerializer(borrow)
+        borrow = serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            BorrowRecordSerializer(borrow).data,
+            status=status.HTTP_201_CREATED,
+        )
+
 
 class ReturnBookView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         try:
             borrow = BorrowRecord.objects.get(
@@ -48,7 +39,9 @@ class ReturnBookView(APIView):
             )
         except BorrowRecord.DoesNotExist:
             return Response(
-                {"error": "Borrow record not found."},
+                {
+                    "error": "Borrow record not found."
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -61,15 +54,21 @@ class ReturnBookView(APIView):
         book.save()
 
         return Response(
-            {"message": "Book returned successfully."}
+            {
+                "message": "Book returned successfully."
+            }
         )
-    
+
+
 class MyBorrowedBooksView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = BorrowRecordSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return BorrowRecord.objects.filter(
             user=self.request.user,
             returned=False,
-        ).select_related("book", "user")
+        ).select_related(
+            "user",
+            "book",
+        )

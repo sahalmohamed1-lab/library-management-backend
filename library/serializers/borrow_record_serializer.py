@@ -16,7 +16,7 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BorrowRecord
-        fields = [
+        fields = (
             "id",
             "user",
             "username",
@@ -27,16 +27,55 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
             "returned",
             "created_at",
             "updated_at",
-        ]
+        )
 
         read_only_fields = (
             "id",
             "user",
+            "username",
+            "book_title",
             "borrow_date",
             "return_date",
             "returned",
             "created_at",
             "updated_at",
-            "username",
-            "book_title",
         )
+
+    def validate(self, attrs):
+        request = self.context["request"]
+        book = attrs["book"]
+
+        if not book.available:
+            raise serializers.ValidationError(
+                {
+                    "book": "This book is currently unavailable."
+                }
+            )
+
+        already_borrowed = BorrowRecord.objects.filter(
+            user=request.user,
+            book=book,
+            returned=False,
+        ).exists()
+
+        if already_borrowed:
+            raise serializers.ValidationError(
+                {
+                    "book": "You have already borrowed this book."
+                }
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        request = self.context["request"]
+
+        borrow = BorrowRecord.objects.create(
+            user=request.user,
+            book=validated_data["book"],
+        )
+
+        borrow.book.available = False
+        borrow.book.save()
+
+        return borrow
