@@ -2,11 +2,12 @@ from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAuthenticated
 from library.models import Book, BorrowRecord
 from library.serializers import BorrowRecordSerializer
 
 class BorrowBookView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         book_id = request.data.get("book")
 
@@ -37,6 +38,7 @@ class BorrowBookView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ReturnBookView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, pk):
         try:
             borrow = BorrowRecord.objects.get(
@@ -63,6 +65,7 @@ class ReturnBookView(APIView):
         )
     
 class MyBorrowedBooksView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = BorrowRecordSerializer
 
     def get_queryset(self):
