@@ -6,10 +6,11 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
-python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 django-cors-headers = "*"
 django-filter = "*"
+python-dotenv = "*"
+python-decouple = "*"
 psycopg = {extras = ["binary"], version = "*"}
 
 [dev-packages]
