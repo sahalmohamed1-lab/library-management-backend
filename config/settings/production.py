@@ -3,6 +3,8 @@ from .base import *
 
 DEBUG = False
 
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -13,3 +15,11 @@ DATABASES = {
         "PORT": config("POSTGRES_PORT"),
     }
 }
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MIDDLEWARE.insert(
+    1,
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+)
