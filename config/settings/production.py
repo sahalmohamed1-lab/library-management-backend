@@ -23,3 +23,7 @@ MIDDLEWARE.insert(
     1,
     "whitenoise.middleware.WhiteNoiseMiddleware",
 )
+
+CORS_ALLOWED_ORIGINS = [
+    "https://admirable-malabi-bc422f.netlify.app",
+]
