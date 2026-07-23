@@ -1,5 +1,4 @@
 from django.urls import path
-
 from library.views.category_views import (
     CategoryDetailView,
     CategoryListCreateView,

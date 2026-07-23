@@ -1,5 +1,4 @@
 from django.urls import path
-
 from library.views.book_views import (
     BookDetailView,
     BookListCreateView,

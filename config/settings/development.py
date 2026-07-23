@@ -2,9 +2,7 @@ from decouple import config
 
 from .base import *
 
-
 DEBUG = True
-
 
 DATABASES = {
     "default": {

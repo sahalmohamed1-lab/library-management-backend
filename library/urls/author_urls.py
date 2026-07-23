@@ -1,5 +1,4 @@
 from django.urls import path
-
 from library.views.author_views import (
     AuthorDetailView,
     AuthorListCreateView,

@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-
 class DashboardSerializer(serializers.Serializer):
     books = serializers.IntegerField()
     authors = serializers.IntegerField()
