@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from library.models import Author, Book, BorrowRecord, Category
+from library.serializers.dashboard_serializer import DashboardSerializer
 
 
 class DashboardAPIView(APIView):
@@ -23,4 +24,6 @@ class DashboardAPIView(APIView):
             ).count(),
         }
 
-        return Response(data)
+        serializer = DashboardSerializer(data)
+
+        return Response(serializer.data)
